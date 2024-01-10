@@ -1,7 +1,7 @@
 package product
 
 type Product struct {
-	Id int64
-	Title string
-	Description string
+	Id          int64  `json:"id"`
+	Title       string `json:"title"`
+	Description string `json:"description"`
 }

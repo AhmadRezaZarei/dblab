@@ -7,8 +7,8 @@ import (
 )
 
 type PrimarySubstance struct {
-	Id    int64
-	Title string
+	Id    int64  `json:"id"`
+	Title string `json:"title"`
 }
 
 type PrimarySubstanceTransaction struct {

@@ -21,7 +21,7 @@ func init() {
 
 func AddRoutes(r *gin.Engine) {
 
-	dataview.RegisterDataView("customers", db.Raw("SELECT * FROM customers"))
+	dataview.RegisterDataView("customers", "SELECT * FROM customers")
 
 	r.POST("/customers", CreateCustomer)
 	r.GET("/customers/:id", GetCustomer)
@@ -36,7 +36,7 @@ func CreateCustomer(c *gin.Context) {
 		c.JSON(400, gin.H{"error": err.Error()})
 		return
 	}
-	db.Exec("INSERT INTO customers (title, phone_number) VALUES (?, ?) RETURNING (id, title, phone_number)", customer.Title, customer.PhoneNumber)
+	db.Exec("INSERT INTO customers (title, phone_number) VALUES (?, ?)", customer.Title, customer.PhoneNumber)
 	c.JSON(200, customer)
 }
 func GetCustomer(c *gin.Context) {

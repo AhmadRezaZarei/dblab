@@ -1,19 +1,20 @@
 package dataview
 
 import (
+	"context"
 	"fmt"
 
+	"db.com/modules/dbutil"
 	"github.com/gin-gonic/gin"
-	"gorm.io/gorm"
 )
 
-var dataviewMap map[string]*gorm.DB
+var dataviewMap map[string]string
 
 func init() {
-	dataviewMap = make(map[string]*gorm.DB)
+	dataviewMap = make(map[string]string)
 }
 
-func RegisterDataView(key string, q *gorm.DB) {
+func RegisterDataView(key string, q string) {
 	dataviewMap[key] = q
 }
 
@@ -22,6 +23,8 @@ func AddRoutes(r *gin.Engine) {
 }
 
 func Get(c *gin.Context) {
+
+	db, err := dbutil.GormDB(context.Background())
 
 	key := c.Param("key")
 	q, ok := dataviewMap[key]
@@ -35,9 +38,9 @@ func Get(c *gin.Context) {
 	}
 
 	fmt.Println("here")
-	var results []map[string]interface{}
+	results := make([]map[string]interface{}, 0)
 
-	err := q.Scan(&results).Error
+	err = db.Raw(q).Scan(&results).Error
 	if err != nil {
 		c.JSON(500, gin.H{
 			"error": err.Error(),

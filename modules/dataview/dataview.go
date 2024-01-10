@@ -16,7 +16,7 @@ func RegisterDataView(key string, q *gorm.DB) {
 }
 
 func AddRoutes(r *gin.Engine) {
-	r.GET("")
+	r.GET("/dataview/:key", Get)
 }
 
 func Get(c *gin.Context) {

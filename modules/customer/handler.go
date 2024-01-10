@@ -3,6 +3,7 @@ package customer
 import (
 	"context"
 
+	"db.com/modules/dataview"
 	"db.com/modules/dbutil"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
@@ -19,6 +20,9 @@ func init() {
 }
 
 func AddRoutes(r *gin.Engine) {
+
+	dataview.RegisterDataView("customers", db.Raw("SELECT * FROM customers"))
+
 	r.POST("/customers", CreateCustomer)
 	r.GET("/customers", GetCustomers)
 	r.GET("/customers/:id", GetCustomer)

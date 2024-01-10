@@ -24,7 +24,6 @@ func AddRoutes(r *gin.Engine) {
 	dataview.RegisterDataView("customers", db.Raw("SELECT * FROM customers"))
 
 	r.POST("/customers", CreateCustomer)
-	r.GET("/customers", GetCustomers)
 	r.GET("/customers/:id", GetCustomer)
 	r.PUT("/customers/:id", UpdateCustomer)
 	r.DELETE("/customers/:id", DeleteCustomer)
@@ -37,16 +36,9 @@ func CreateCustomer(c *gin.Context) {
 		c.JSON(400, gin.H{"error": err.Error()})
 		return
 	}
-	db.Exec("INSERT INTO customers (title, phone_number) VALUES (?, ?)", customer.Title, customer.PhoneNumber)
+	db.Exec("INSERT INTO customers (title, phone_number) VALUES (?, ?) RETURNING (id, title, phone_number)", customer.Title, customer.PhoneNumber)
 	c.JSON(200, customer)
 }
-
-func GetCustomers(c *gin.Context) {
-	var customers []Customer
-	db.Raw("SELECT * FROM customers").Scan(&customers)
-	c.JSON(200, customers)
-}
-
 func GetCustomer(c *gin.Context) {
 	var customer Customer
 	id := c.Param("id")

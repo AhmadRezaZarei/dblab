@@ -1,6 +1,8 @@
 package dataview
 
 import (
+	"fmt"
+
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
@@ -21,9 +23,10 @@ func AddRoutes(r *gin.Engine) {
 
 func Get(c *gin.Context) {
 
-	key := c.Param("id")
+	key := c.Param("key")
 	q, ok := dataviewMap[key]
 
+	fmt.Println("here")
 	if !ok {
 		c.JSON(404, gin.H{
 			"error": "not found",
@@ -31,6 +34,7 @@ func Get(c *gin.Context) {
 		return
 	}
 
+	fmt.Println("here")
 	var results []map[string]interface{}
 
 	err := q.Scan(&results).Error

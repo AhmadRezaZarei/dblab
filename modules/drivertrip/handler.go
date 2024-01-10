@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"db.com/modules/dataview"
 	"db.com/modules/dbutil"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
@@ -22,7 +23,10 @@ func init() {
 
 func AddRoutes(r *gin.Engine) {
 
-	
+	dataview.RegisterDataView("driver_trips", `SELECT dt.id ,dt.source, dt.destination, CONCAT(s.first_name, s.last_name ) as supplier_title, CONCAT(d.first_name, d.last_name) AS driver_title FROM driver_trips AS dt
+		INNER JOIN employees AS d ON dt.driver_id = d.id 
+		INNER JOIN suppliers AS s ON s.id = dt.supplier_id
+		`)
 
 	r.POST("/drivertrips", CreateDriverTrip)
 	r.GET("/drivertrips/:id", GetDriverTrip)
@@ -32,11 +36,13 @@ func AddRoutes(r *gin.Engine) {
 }
 
 func CreateDriverTrip(c *gin.Context) {
-	var driverTrip DriverTrip
-	if err := c.ShouldBindJSON(&driverTrip); err != nil {
+	var req DriverTripRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+
+	driverTrip := req.Model
 
 	// Use raw SQL to insert a new DriverTrip
 	result := db.Exec("INSERT INTO driver_trips (supplier_id, source, destination, driver_id, date) VALUES (?, ?, ?, ?, ?)",
@@ -44,6 +50,13 @@ func CreateDriverTrip(c *gin.Context) {
 	if result.Error != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": result.Error.Error()})
 		return
+	}
+
+	var lastInsertID int64
+	db.Raw("SELECT LAST_INSERT_ID()").Scan(&lastInsertID)
+
+	for _, item := range req.Items {
+		db.Exec("INSERT INTO driver_trip_items (trip_id, primary_substance_id, quantity, price) VALUES (?, ?, ? , ?)", lastInsertID, item.PrimarySubstanceId, item.Quantity, item.Price)
 	}
 
 	c.JSON(http.StatusCreated, driverTrip)

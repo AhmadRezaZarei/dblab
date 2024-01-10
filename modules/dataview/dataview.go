@@ -29,7 +29,7 @@ func Get(c *gin.Context) {
 	key := c.Param("key")
 	q, ok := dataviewMap[key]
 
-	fmt.Println("here")
+	fmt.Println("here1", key)
 	if !ok {
 		c.JSON(404, gin.H{
 			"error": "not found",

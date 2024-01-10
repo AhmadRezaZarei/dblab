@@ -5,9 +5,11 @@ import (
 
 	"db.com/modules/customer"
 	"db.com/modules/dataview"
+	"db.com/modules/drivertrip"
 	"db.com/modules/employee"
 	"db.com/modules/primarysubstance"
 	"db.com/modules/product"
+	"db.com/modules/stock"
 	"db.com/modules/supplier"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
@@ -28,6 +30,8 @@ func main() {
 	primarysubstance.AddRoutes(r)
 	product.AddRoutes(r)
 	supplier.AddRoutes(r)
+	stock.AddRoutes(r)
+	drivertrip.AddRoutes(r)
 
 	r.GET("/ping", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{

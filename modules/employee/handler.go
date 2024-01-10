@@ -22,7 +22,7 @@ func init() {
 
 func AddRoutes(r *gin.Engine) {
 
-	dataview.RegisterDataView("employees", "SELECT * FROM employee")
+	dataview.RegisterDataView("employees", "SELECT * FROM employees")
 
 	r.POST("/employee", createEmployee)
 	r.GET("/employees", getEmployees)

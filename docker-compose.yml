@@ -1,0 +1,55 @@
+version: '3.8'
+services:
+  goapp:
+    build: .
+    container_name: goapp_container
+    restart: unless-stopped
+    image: goapp_image
+    ports:
+      - "0.0.0.0:3000:3000"
+    depends_on:
+      - factory_db
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+  factory_db:
+    image: mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: root
+    volumes:
+      - mysql_db_volume99:/var/lib/mysql
+    ports:
+      - "3306:3306"
+  phpmyadmin:
+      depends_on:
+        - factory_db
+      image: phpmyadmin
+      restart: always
+      ports:
+        - "0.0.0.0:8090:80"
+      environment:
+        PMA_HOST: factory_db
+        MYSQL_ROOT_PASSWORD: e1e0c085
+  dozzle:
+    image: amir20/dozzle:latest
+    environment:
+      DOZZLE_LEVEL: debug
+      DOZZLE_USERNAME_FILE: /run/secrets/dozzle_user
+      DOZZLE_PASSWORD_FILE: /run/secrets/dozzle_password
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    secrets:
+      - dozzle_user
+      - dozzle_password
+    ports:
+      - 5543:8080
+
+volumes:
+  mysql_db_volume99:
+
+secrets:
+  dozzle_user:
+    file: dozzle_user.txt
+  dozzle_password:
+    file: dozzle_password.txt
